@@ -21,7 +21,7 @@ def prepare_dataset_for_modeling(dataset_name,
     :param dataset_name: name of the dataset (in CSV format)
     :param data_directory: directory of the dataset. If None, the dataset will be read in from GitHub
     :param n_samples: how many instances to sample (if not None)
-    :param random_state: seed for (1) sampling instances and (2) shuffling instances at the end
+    :param random_state: seed for shuffling instances and sampling instances 
     :param drop_const_columns: if True, drop constant-value columns (*after* any sampling)
     :param scale_x: whether the descriptive features are to be min-max scaled
     :param is_classification: if True, y values will be label-encoded for use in classification models
