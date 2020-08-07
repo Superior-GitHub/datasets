@@ -12,7 +12,7 @@ from sklearn.utils import shuffle
 
 def prepare_dataset_for_modeling(dataset_name,
                                  data_directory=None,
-                                 n_ins=-1,
+                                 n_samples=None,
                                  random_state=999,
                                  drop_const_columns=True,
                                  scale_x=True,
@@ -20,7 +20,7 @@ def prepare_dataset_for_modeling(dataset_name,
     """
     :param dataset_name: name of the dataset (in CSV format)
     :param data_directory: directory of the dataset. If None, the dataset will be read in from GitHub
-    :param n_ins: how many instances to sample (if > 0)
+    :param n_samples: how many instances to sample (if not None)
     :param random_state: seed for (1) sampling instances and (2) shuffling instances at the end
     :param drop_const_columns: if True, drop constant-value columns (*after* any sampling)
     :param scale_x: whether the descriptive features are to be min-max scaled
@@ -43,13 +43,8 @@ def prepare_dataset_for_modeling(dataset_name,
     # drop missing values if there are any
     df = df.dropna()
 
-    # sample a smaller subset if n_ins > 0
-    if n_ins > 0:
-        df = df.sample(n=n_ins, replace=False, random_state=random_state)
-
-    # if needed, you can drop unique-value columns as below
-    # apparently not all unique-value columns are ID columns!
-    # ### df = df.loc[:, df.nunique() < df.shape[0]]
+    # shuffle dataset in case of a pattern and subsample if requested
+    df = shuffle(df, n_samples=n_samples, random_state=random_state)
 
     if drop_const_columns:
         # drop constant columns
@@ -82,9 +77,6 @@ def prepare_dataset_for_modeling(dataset_name,
     if is_classification:
         # label-encode y for classification problems
         y = preprocessing.LabelEncoder().fit_transform(y)
-
-    # shuffle dataset at the end
-    x, y = shuffle(x, y, random_state=random_state)
 
     return x, y
 
