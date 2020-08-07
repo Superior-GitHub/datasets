@@ -73,7 +73,7 @@ def prepare_dataset_for_modeling(dataset_name,
 
     # for categorical features with >2 levels: use one-hot-encoding
     # below, numerical columns will be untouched
-    x = pd.get_dummies(x)
+    x = pd.get_dummies(x).values
 
     if scale_x:
         # scale x between 0 and 1
