@@ -18,10 +18,11 @@ def prepare_dataset_for_modeling(dataset_name,
                                  scale_x=True,
                                  is_classification=True):
     """
+    ASSUMPTION: The target variable is the LAST column in the dataset.
     :param dataset_name: name of the dataset (in CSV format)
     :param data_directory: directory of the dataset. If None, the dataset will be read in from GitHub
     :param n_samples: how many instances to sample (if not None)
-    :param random_state: seed for shuffling instances and sampling instances 
+    :param random_state: seed for shuffling instances and sampling instances
     :param drop_const_columns: if True, drop constant-value columns (*after* any sampling)
     :param scale_x: whether the descriptive features are to be min-max scaled
     :param is_classification: if True, y values will be label-encoded for use in classification models
@@ -44,6 +45,7 @@ def prepare_dataset_for_modeling(dataset_name,
     df = df.dropna()
 
     # shuffle dataset in case of a pattern and subsample if requested
+    # n_samples = None results in no sampling
     df = shuffle(df, n_samples=n_samples, random_state=random_state)
 
     if drop_const_columns:
@@ -55,7 +57,7 @@ def prepare_dataset_for_modeling(dataset_name,
     # everything else is x (set of descriptive features)
     x = df.iloc[:, :-1]
 
-    # get all columns that are strings
+    # get all columns that are objects
     # these are assumed to be nominal categorical
     categorical_cols = x.columns[x.dtypes == object].tolist()
 
@@ -80,5 +82,5 @@ def prepare_dataset_for_modeling(dataset_name,
 
     return x, y
 
-# ## how to run this script
+# ## example: how to run this script
 # x, y = prepare_dataset_for_modeling('us_census_income_data.csv')
