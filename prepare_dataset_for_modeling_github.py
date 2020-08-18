@@ -15,7 +15,7 @@ def prepare_dataset_for_modeling(dataset_name,
                                  n_samples=None,
                                  random_state=999,
                                  drop_const_columns=True,
-                                 scale_x=True,
+                                 scale_data=True,
                                  is_classification=True):
     """
     ASSUMPTION: The target variable is the LAST column in the dataset.
@@ -24,7 +24,7 @@ def prepare_dataset_for_modeling(dataset_name,
     :param n_samples: how many instances to sample (if not None)
     :param random_state: seed for shuffling instances and sampling instances
     :param drop_const_columns: if True, drop constant-value columns (*after* any sampling)
-    :param scale_x: whether the descriptive features are to be min-max scaled
+    :param scale_data: whether the descriptive features (and y if regression) are to be min-max scaled
     :param is_classification: if True, y values will be label-encoded for use in classification models
     :return: x and y NumPy arrays ready for model fitting
     """
@@ -53,7 +53,7 @@ def prepare_dataset_for_modeling(dataset_name,
         df = df.loc[:, df.nunique() > 1]
 
     # last column is y (target feature)
-    y = df.iloc[:, -1]
+    y = df.iloc[:, -1].values
     # everything else is x (set of descriptive features)
     x = df.iloc[:, :-1]
 
@@ -72,9 +72,12 @@ def prepare_dataset_for_modeling(dataset_name,
     # below, numerical columns will be untouched
     x = pd.get_dummies(x).values
 
-    if scale_x:
+    if scale_data:
         # scale x between 0 and 1
         x = preprocessing.MinMaxScaler().fit_transform(x)
+        if not is_classification:
+            # scale y between 0 and 1 for regression problems
+            y = preprocessing.MinMaxScaler().fit_transform(y.reshape(-1, 1)).flatten()
 
     if is_classification:
         # label-encode y for classification problems
