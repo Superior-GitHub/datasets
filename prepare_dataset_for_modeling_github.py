@@ -11,21 +11,21 @@ from sklearn.utils import shuffle
 
 
 def prepare_dataset_for_modeling(dataset_name,
+                                 is_classification,
                                  data_directory=None,
                                  n_samples=None,
                                  random_state=999,
                                  drop_const_columns=True,
-                                 scale_data=True,
-                                 is_classification=True):
+                                 scale_data=True):
     """
     ASSUMPTION: The target variable is the LAST column in the dataset.
     :param dataset_name: name of the dataset (in CSV format)
+    :param is_classification: if True, y values will be label-encoded for use in classification models
     :param data_directory: directory of the dataset. If None, the dataset will be read in from GitHub
     :param n_samples: how many instances to sample (if not None)
     :param random_state: seed for shuffling instances and sampling instances
     :param drop_const_columns: if True, drop constant-value columns (*after* any sampling)
     :param scale_data: whether the descriptive features (and y if regression) are to be min-max scaled
-    :param is_classification: if True, y values will be label-encoded for use in classification models
     :return: x and y NumPy arrays ready for model fitting
     """
 
@@ -86,4 +86,4 @@ def prepare_dataset_for_modeling(dataset_name,
     return x, y
 
 # ## example: how to run this script
-# x, y = prepare_dataset_for_modeling('sonar.csv')
+# x, y = prepare_dataset_for_modeling('sonar.csv', is_classification=True)
