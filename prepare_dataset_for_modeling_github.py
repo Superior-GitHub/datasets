@@ -87,4 +87,4 @@ def prepare_dataset_for_modeling(dataset_name,
     return x, y
 
 # ## example: how to run this script
-# x, y = prepare_dataset_for_modeling('sonar.csv')
+# x, y = prepare_dataset_for_modeling('sonar.csv', is_classification=True)
