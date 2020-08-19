@@ -20,7 +20,8 @@ def prepare_dataset_for_modeling(dataset_name,
     """
     ASSUMPTION: The target variable is the LAST column in the dataset.
     :param dataset_name: name of the dataset (in CSV format)
-    :param is_classification: if True, y values will be label-encoded for use in classification models
+    :param is_classification: if True, y is categorical and it will be label-encoded for model fitting
+                              if False, this is a regression problem (y is numeric)
     :param data_directory: directory of the dataset. If None, the dataset will be read in from GitHub
     :param n_samples: how many instances to sample (if not None)
     :param random_state: seed for shuffling instances and sampling instances
@@ -86,4 +87,4 @@ def prepare_dataset_for_modeling(dataset_name,
     return x, y
 
 # ## example: how to run this script
-# x, y = prepare_dataset_for_modeling('sonar.csv', is_classification=True)
+# x, y = prepare_dataset_for_modeling('sonar.csv')
