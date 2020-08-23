@@ -13,18 +13,21 @@ from sklearn.utils import shuffle
 def prepare_dataset_for_modeling(dataset_name,
                                  is_classification,
                                  data_directory=None,
+                                 na_values=None,
                                  n_samples=None,
                                  random_state=999,
                                  drop_const_columns=True,
                                  scale_data=True):
     """
-    ASSUMPTION: The target variable is the LAST column in the dataset.
-    :param dataset_name: name of the dataset (in CSV format)
-    :param is_classification: if True, y is categorical and it will be label-encoded for model fitting
-                              if False, this is a regression problem (y is numeric)
+    ASSUMPTION 1: The target variable is the LAST column in the dataset.
+    ASSUMPTION 2: First row in the file is the header row.
+    :param dataset_name: name of the dataset - will be passed to pd.read_csv()
+    :param is_classification: if True, y is assumed categorical and it will be label-encoded for model fitting
+                              if False, y is assumed numerical
     :param data_directory: directory of the dataset. If None, the dataset will be read in from GitHub
+    :param na_values: Additional strings to recognize as NA/NaN - will be passed to pd.read_csv()
     :param n_samples: how many instances to sample (if not None)
-    :param random_state: seed for shuffling instances and sampling instances
+    :param random_state: seed for shuffling (and sampling) instances
     :param drop_const_columns: if True, drop constant-value columns (*after* any sampling)
     :param scale_data: whether the descriptive features (and y if regression) are to be min-max scaled
     :return: x and y NumPy arrays ready for model fitting
@@ -32,7 +35,7 @@ def prepare_dataset_for_modeling(dataset_name,
 
     if data_directory:
         # read in from local directory
-        df = pd.read_csv(data_directory + dataset_name, header=0)
+        df = pd.read_csv(data_directory + dataset_name, na_values=na_values, header=0)
     else:
         # read in the data file from GitHub into a Pandas data frame
         if (not os.environ.get('PYTHONHTTPSVERIFY', '') and
@@ -40,7 +43,7 @@ def prepare_dataset_for_modeling(dataset_name,
             ssl._create_default_https_context = ssl._create_unverified_context
         github_location = 'https://raw.githubusercontent.com/vaksakalli/datasets/master/'
         dataset_url = github_location + dataset_name.lower()
-        df = pd.read_csv(io.StringIO(requests.get(dataset_url).content.decode('utf-8')), header=0)
+        df = pd.read_csv(io.StringIO(requests.get(dataset_url).content.decode('utf-8')), na_values=na_values, header=0)
 
     # drop missing values if there are any
     df = df.dropna()
@@ -50,7 +53,7 @@ def prepare_dataset_for_modeling(dataset_name,
     df = shuffle(df, n_samples=n_samples, random_state=random_state)
 
     if drop_const_columns:
-        # drop constant columns
+        # drop constant columns (after sampling)
         df = df.loc[:, df.nunique() > 1]
 
     # last column is y (target feature)
@@ -62,7 +65,7 @@ def prepare_dataset_for_modeling(dataset_name,
     # these are assumed to be nominal categorical
     categorical_cols = x.columns[x.dtypes == object].tolist()
 
-    # if a nominal feature has only 2 levels:
+    # if a categorical feature has only 2 levels:
     # encode it as a single binary variable
     for col in categorical_cols:
         n = len(x[col].unique())
@@ -77,7 +80,7 @@ def prepare_dataset_for_modeling(dataset_name,
         # scale x between 0 and 1
         x = preprocessing.MinMaxScaler().fit_transform(x)
         if not is_classification:
-            # scale y between 0 and 1 for regression problems
+            # also scale y between 0 and 1 for regression problems
             y = preprocessing.MinMaxScaler().fit_transform(y.reshape(-1, 1)).flatten()
 
     if is_classification:
@@ -86,5 +89,6 @@ def prepare_dataset_for_modeling(dataset_name,
 
     return x, y
 
+
 # ## example: how to run this script
-# x, y = prepare_dataset_for_modeling('sonar.csv', is_classification=True)
+x, y = prepare_dataset_for_modeling('sonar.csv', is_classification=True)
