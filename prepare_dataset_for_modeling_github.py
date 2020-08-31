@@ -14,7 +14,7 @@ def prepare_dataset_for_modeling(dataset_name,
                                  is_classification,
                                  data_directory=None,
                                  na_values=None,
-                                 n_samples=None,
+                                 n_samples_max=None,
                                  random_state=999,
                                  drop_const_columns=True,
                                  scale_data=True):
@@ -26,7 +26,7 @@ def prepare_dataset_for_modeling(dataset_name,
                               if False, y is assumed numerical
     :param data_directory: directory of the dataset. If None, the dataset will be read in from GitHub
     :param na_values: Additional strings to recognize as NA/NaN - will be passed to pd.read_csv()
-    :param n_samples: how many instances to sample (if not None)
+    :param n_samples_max: max no. of instances to sample (if not None)
     :param random_state: seed for shuffling (and sampling) instances
     :param drop_const_columns: if True, drop constant-value columns (*after* any sampling)
     :param scale_data: whether the descriptive features (and y if regression) are to be min-max scaled
@@ -48,8 +48,14 @@ def prepare_dataset_for_modeling(dataset_name,
     # drop missing values if there are any
     df = df.dropna()
 
-    # shuffle dataset in case of a pattern and subsample if requested
-    # n_samples = None results in no sampling
+    # shuffle dataset in case of a pattern and also subsample if requested
+    # but do not sample more than the available no. of observations (after dropping missing values)
+    # n_samples_max = None results in no sampling; just shuffling
+    n_observations = df.shape[0]  # no. of observations in the dataset
+    n_samples = n_observations  # initialization - no. of observations after (any) sampling
+    if n_samples_max and (n_samples_max < n_observations):
+        # do not sample more rows than what is in the dataset
+        n_samples = n_samples_max
     df = shuffle(df, n_samples=n_samples, random_state=random_state)
 
     if drop_const_columns:
