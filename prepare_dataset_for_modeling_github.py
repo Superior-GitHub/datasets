@@ -13,7 +13,7 @@ from sklearn.utils import shuffle
 def prepare_dataset_for_modeling(dataset_name,
                                  is_classification,
                                  data_directory=None,
-                                 na_values=None,
+                                 na_values='?',
                                  n_samples_max=None,
                                  random_state=999,
                                  drop_const_columns=True,
