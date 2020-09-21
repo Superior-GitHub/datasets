@@ -29,7 +29,7 @@ def prepare_dataset_for_modeling(dataset_name,
     :param n_samples_max: max no. of instances to sample (if not None)
     :param random_state: seed for shuffling (and sampling) instances
     :param drop_const_columns: if True, drop constant-value columns (*after* any sampling)
-    :param scale_data: whether the descriptive features (and y if regression) are to be min-max scaled
+    :param scale_data: whether the descriptive features (and y also if regression) are to be min-max scaled
     :return: x and y NumPy arrays ready for model fitting
     """
 
@@ -49,7 +49,7 @@ def prepare_dataset_for_modeling(dataset_name,
     df = df.dropna()
 
     # shuffle dataset in case of a pattern and also subsample if requested
-    # but do not sample more than the available no. of observations (after dropping missing values)
+    # but do not sample more than the available number of observations (after dropping missing values)
     # n_samples_max = None results in no sampling; just shuffling
     n_observations = df.shape[0]  # no. of observations in the dataset
     n_samples = n_observations  # initialization - no. of observations after (any) sampling
@@ -96,5 +96,5 @@ def prepare_dataset_for_modeling(dataset_name,
     return x, y
 
 
-# ## example: how to run this script
-x, y = prepare_dataset_for_modeling('sonar.csv', is_classification=True)
+# # example: how to run this script
+# x, y = prepare_dataset_for_modeling('sonar.csv', is_classification=True)
