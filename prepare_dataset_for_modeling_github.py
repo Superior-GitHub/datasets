@@ -11,7 +11,7 @@ from sklearn.utils import shuffle
 
 
 def prepare_dataset_for_modeling(dataset_name,
-                                 is_classification,
+                                 pred_type,
                                  data_directory=None,
                                  na_values='?',
                                  n_samples_max=None,
@@ -22,8 +22,8 @@ def prepare_dataset_for_modeling(dataset_name,
     ASSUMPTION 1: The target variable is the LAST column in the dataset.
     ASSUMPTION 2: First row in the file is the header row.
     :param dataset_name: name of the dataset - will be passed to pd.read_csv()
-    :param is_classification: if True, y is assumed categorical and it will be label-encoded for model fitting
-                              if False, y is assumed numerical
+    :param pred_type: if 'c' for classification, y is assumed categorical and it will be label-encoded for model fitting
+                      if 'r' for regression, y is assumed numerical
     :param data_directory: directory of the dataset. If None, the dataset will be read in from GitHub
     :param na_values: Additional strings to recognize as NA/NaN - will be passed to pd.read_csv()
     :param n_samples_max: max no. of instances to sample (if not None)
@@ -32,6 +32,9 @@ def prepare_dataset_for_modeling(dataset_name,
     :param scale_data: whether the descriptive features (and y also if regression) are to be min-max scaled
     :return: x and y NumPy arrays ready for model fitting
     """
+
+    if pred_type not in ['c', 'r']:
+        raise ValueError("Error: prediction type needs to be either 'c' for classification or 'r' for regression.")
 
     if data_directory:
         # read in from local directory
@@ -45,11 +48,11 @@ def prepare_dataset_for_modeling(dataset_name,
         dataset_url = github_location + dataset_name.lower()
         df = pd.read_csv(io.StringIO(requests.get(dataset_url).content.decode('utf-8')), na_values=na_values, header=0)
 
-    # drop missing values if there are any
+    # drop missing values before (any) sampling
     df = df.dropna()
 
     # shuffle dataset in case of a pattern and also subsample if requested
-    # but do not sample more than the available number of observations (after dropping missing values)
+    # but do not sample more than the available number of observations (*after* dropping missing values)
     # n_samples_max = None results in no sampling; just shuffling
     n_observations = df.shape[0]  # no. of observations in the dataset
     n_samples = n_observations  # initialization - no. of observations after (any) sampling
@@ -85,11 +88,11 @@ def prepare_dataset_for_modeling(dataset_name,
     if scale_data:
         # scale x between 0 and 1
         x = preprocessing.MinMaxScaler().fit_transform(x)
-        if not is_classification:
+        if pred_type == 'r':
             # also scale y between 0 and 1 for regression problems
             y = preprocessing.MinMaxScaler().fit_transform(y.reshape(-1, 1)).flatten()
 
-    if is_classification:
+    if pred_type == 'c':
         # label-encode y for classification problems
         y = preprocessing.LabelEncoder().fit_transform(y)
 
@@ -97,4 +100,4 @@ def prepare_dataset_for_modeling(dataset_name,
 
 
 # # example: how to run this script
-# x, y = prepare_dataset_for_modeling('sonar.csv', is_classification=True)
+# x, y = prepare_dataset_for_modeling('sonar.csv', pred_type='c')
