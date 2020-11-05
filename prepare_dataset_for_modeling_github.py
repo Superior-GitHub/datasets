@@ -100,4 +100,4 @@ def prepare_dataset_for_modeling(dataset_name,
 
 
 # # example: how to run this script
-# x, y = prepare_dataset_for_modeling_github('sonar.csv', pred_type='c')
+# x, y = prepare_dataset_for_modeling('sonar.csv', pred_type='c')
