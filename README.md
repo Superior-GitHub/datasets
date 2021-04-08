@@ -15,4 +15,4 @@ A sample Python script named **"prepare_dataset_for_modeling_github.py"** has al
 
 Description of these datasets can be found in the "github_datasets_desc" Notebook file:
 
-https://github.com/vaksakalli/datasets/blob/master/github_datasets_desc.ipynb
+https://github.com/vaksakalli/datasets/blob/master/github_dataset_descriptions.ipynb
