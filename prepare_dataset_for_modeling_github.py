@@ -66,7 +66,7 @@ def prepare_dataset_for_modeling(dataset_name,
         df = df.loc[:, df.nunique() > 1]
 
     if len(df) == 0:
-        return ValueError("Error: empty dataset after cleaning.")
+        raise ValueError("Error: empty dataset after cleaning.")
 
     # last column is y (target feature)
     y = df.iloc[:, -1].values
