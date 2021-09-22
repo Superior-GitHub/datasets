@@ -80,7 +80,7 @@ def prepare_dataset_for_modeling(dataset_name,
     # if a categorical feature has only 2 levels:
     # encode it as a single binary variable
     for col in categorical_cols:
-        n = len(x[col].unique())
+        n = x[col].nunique()
         if n == 2:
             x[col] = pd.get_dummies(x[col], drop_first=True)
 
